@@ -2,7 +2,7 @@
 Contributors: Mohammad Imran
 Tags: messaging, bulk messaging, messages, friends, user profile, BuddyBoss
 Requires at least: 5.0
-Tested up to: 6.0
+Tested up to: 6.7
 Requires PHP: 7.2
 Stable tag: 1.0.0
 License: GPL-2.0+
