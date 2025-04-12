@@ -29,4 +29,30 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+	jQuery(document).ready(function($) {
+	    if (typeof massMessagingData !== 'undefined' && massMessagingData.connections) {
+	        var connections = massMessagingData.connections;
+
+	        var checkSelect2 = setInterval(function() {
+	            if ($('#send-to-input').hasClass('select2-hidden-accessible')) {
+	                clearInterval(checkSelect2);
+
+	                var selectedIds = connections.map(function(item) {
+	                    return item.id;
+	                });
+
+	                $('#send-to-input').val(selectedIds);
+
+	                connections.forEach(function(item) {
+	                    var option = new Option(item.text, item.id, true, true);
+	                    $('#send-to-input').append(option);
+	                });
+
+	                $('#send-to-input').trigger('change');
+	            }
+	        }, 100);
+	    }
+	});
+
+
 })( jQuery );

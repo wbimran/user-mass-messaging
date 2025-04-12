@@ -96,26 +96,44 @@ class User_Mass_Messaging_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/user-mass-messaging-public.js', array( 'jquery' ), $this->version, false );
+		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/user-mass-messaging-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 
-	// add button to send message to the connection - mass messaging on user profile
+	/**
+	 * Add button to send message to the connection - mass messaging on user profile
+	 */
 	public function mi_add_send_message_button_user_connection_tab() {
 		if (bp_is_my_profile() ) {
-			$compose_url = bp_loggedin_user_domain() . bp_get_messages_slug() . '/compose/?all_connections=1';
+			$compose_url 	= bp_loggedin_user_domain() . bp_get_messages_slug() . '/compose/?all_connections=1';
+			// Add nonce to the URL
+			$nonce 			= wp_create_nonce('mi_send_message_nonce');
+			$compose_url 	= add_query_arg('message_nonce', $nonce, $compose_url);
 		?>
 		<div class="bp-connections-send-message">
 			<a href="<?php echo esc_url($compose_url); ?>" class="button send-message-to-connections">
-				<?php _e('Send Message', 'user-mass-messaging'); ?>
+				<?php esc_html_e('Send Message', 'user-mass-messaging'); ?>
 			</a>
 		</div>
 		<?php
 		}
 	}
 
-	// manage rediretion on click the send button on use profile under connection tab - mass messaging on user profile
+	/* 
+	* Manage rediretion on click the send button on use profile under connection tab - mass messaging on user profile
+	*/ 
 	public function mi_handle_message_redirect() {
+		 // Verify the nonce
+		 if (isset($_GET['message_nonce']) && !empty($_GET['message_nonce'])) {
+			$nonce = sanitize_text_field(wp_unslash($_GET['message_nonce']));
+	
+			// Check nonce validity
+			if (!wp_verify_nonce($nonce, 'mi_send_message_nonce')) {
+				// Nonce is invalid, stop processing
+				wp_die( esc_html__('Security check failed. Please try again.', 'user-mass-messaging'));
+			}
+		}
+
 		if (isset($_GET['all_connections']) && ! isset($_GET['component']) && $_GET['all_connections'] == 1 && bp_is_messages_component() && bp_is_current_action('compose')) {						
 			add_action('wp_footer', array($this, 'mi_pre_select_connections_on_compose'));
 		} elseif( isset($_GET['component']) && $_GET['component'] == 'team' ){			
@@ -124,22 +142,11 @@ class User_Mass_Messaging_Public {
 	}
 
 
-	// manage auto select the connection on the compose - mass messaging on user profile
-	public function mi_pre_select_connections_on_compose() {
-		$current_url = home_url(add_query_arg(array(), $_SERVER['REQUEST_URI']));
-		parse_str(parse_url($current_url, PHP_URL_QUERY), $params); 
-		$has_team = isset($params['component']) && $params['component'] === 'team';		
-
-		if ($has_team) {
-			$referel_url = home_url(add_query_arg(array(), $_SERVER['HTTP_REFERER']));		
-			$path = parse_url($referel_url, PHP_URL_PATH); 
-			$segments = explode('/', trim($path, '/')); 
-			$circle_id = end($segments);
-			$connections = bcircles_get_circle_users( $circle_id );
-		} else {
-			// Get the current user's connections (friend IDs)
-			$connections = friends_get_friend_user_ids(bp_loggedin_user_id());
-		}
+	/** 
+	 * Manage auto select the connection on the compose - mass messaging on user profile
+	*/ 
+	public function mi_pre_select_connections_on_compose() {		// Get the current user's connections (friend IDs)
+		$connections = friends_get_friend_user_ids(bp_loggedin_user_id());
 
 		// If no connections, exit early
 		if (empty($connections)) {
@@ -155,47 +162,25 @@ class User_Mass_Messaging_Public {
 			$display_name = !empty($first_name) ? $first_name : bp_core_get_username($user_id);
 
 			// Get the raw username (nicename) without any prefixes
-			$user = get_userdata($user_id);
-			$username = $user->user_login; // Use user_login to ensure raw username            
+			$user 		= get_userdata($user_id);
+			$username 	= $user->user_login; // Use user_login to ensure raw username            
 			return [
 				'id' => '@' . $username,    // Apply @bb- prefix once (e.g., @bb-nicolina)
 				'text' => $display_name        // First name (or nicename as fallback) for display
 			];
 		}, $connections);
 
-		// Encode the connection data as JSON
-		$connections_json = json_encode($connection_data);
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function($) {
-				var connections = <?php echo $connections_json; ?>;
+		// Localize the data for use in your JS
+        wp_localize_script(
+            $this->plugin_name,            // The same handle used in wp_enqueue_script
+            'massMessagingData',           // JS object name
+            array(
+                'connections' => $connection_data
+            )
+        );
 
-				// Wait for Select2 to initialize
-				var checkSelect2 = setInterval(function() {
-					if ($('#send-to-input').hasClass('select2-hidden-accessible')) {
-						clearInterval(checkSelect2);
-
-						// Pre-select connections by BuddyBoss-style values
-						var selectedIds = connections.map(function(item) {
-							return item.id; // e.g., @bb-nicolina
-						});
-
-						// Set the selected values in the Select2 field
-						$('#send-to-input').val(selectedIds);
-
-						// Add the options to Select2 with first names as the visible text
-						connections.forEach(function(item) {
-							var option = new Option(item.text, item.id, true, true);
-							$('#send-to-input').append(option);
-						});
-
-						// Trigger change to update the Select2 display
-						$('#send-to-input').trigger('change');
-					}
-				}, 100);
-			});
-		</script>
-		<?php
+		// Enqueue the script only when needed
+		wp_enqueue_script($this->plugin_name);
 	}
 
 }
