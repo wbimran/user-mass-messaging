@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       User Mass Messaging
  * Plugin URI:        https://github.com/wbimran/
- * Description:       Mass message to friends 
+ * Description:       User Mass Messaging allows BuddyBoss users to send bulk messages to all their friends directly from their profile's connections tab, making it easy to communicate with multiple users at once.
  * Version:           1.0.0
  * Author:            Mohammad Imran
  * Author URI:        https://github.com/wbimran//
