@@ -1,5 +1,5 @@
 === User Mass Messaging ===
-Contributors: Mohammad Imran
+Contributors: imranmd
 Tags: messaging, bulk messaging, messages, friends, user profile, BuddyBoss
 Requires at least: 5.0
 Tested up to: 6.7
