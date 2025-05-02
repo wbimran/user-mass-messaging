@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
 == Description ==
 
-User Mass Messaging is a WordPress plugin that allows users to send bulk messages to their friends directly from their profile connection tab. This plugin is perfect for BuddyBoss users who need to send a message to all their connections at once. It adds a "Send Message" button to the user profile, allowing users to compose a message and send it to all their connections at once.
+User Mass Messaging is a WordPress plugin that allows users to send bulk messages to their friends directly from their profile connection tab. This plugin is perfect for BuddyBoss users who need to send a message to all their connections at once. It adds a "Send Message" button to the user profile, enabling users to compose and send a message to all their connected friends in one go.
 
 Features:
 - Send bulk messages to all friends from the profile connection tab.

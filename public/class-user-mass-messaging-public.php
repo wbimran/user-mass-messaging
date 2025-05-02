@@ -103,7 +103,7 @@ class User_Mass_Messaging_Public {
 	/**
 	 * Add button to send message to the connection - mass messaging on user profile
 	 */
-	public function mi_add_send_message_button_user_connection_tab() {
+	public function umm_add_send_message_button_user_connection_tab() {
 		if (bp_is_my_profile() ) {
 			$compose_url 	= bp_loggedin_user_domain() . bp_get_messages_slug() . '/compose/?all_connections=1';
 			// Add nonce to the URL
@@ -122,7 +122,7 @@ class User_Mass_Messaging_Public {
 	/* 
 	* Manage rediretion on click the send button on use profile under connection tab - mass messaging on user profile
 	*/ 
-	public function mi_handle_message_redirect() {
+	public function umm_handle_message_redirect() {
 		 // Verify the nonce
 		 if (isset($_GET['message_nonce']) && !empty($_GET['message_nonce'])) {
 			$nonce = sanitize_text_field(wp_unslash($_GET['message_nonce']));
@@ -145,7 +145,7 @@ class User_Mass_Messaging_Public {
 	/** 
 	 * Manage auto select the connection on the compose - mass messaging on user profile
 	*/ 
-	public function mi_pre_select_connections_on_compose() {		// Get the current user's connections (friend IDs)
+	public function umm_pre_select_connections_on_compose() {		// Get the current user's connections (friend IDs)
 		$connections = friends_get_friend_user_ids(bp_loggedin_user_id());
 
 		// If no connections, exit early
